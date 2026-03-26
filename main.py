@@ -66,6 +66,12 @@ async def generate_clipart(
     
     # 1. Read the image
     input_bytes = await image.read()
+
+    img = Image.open(io.BytesIO(input_bytes))
+    img.thumbnail((800, 800)) 
+    safe_byte_arr = io.BytesIO()
+    img.save(safe_byte_arr, format='PNG')
+    input_bytes = safe_byte_arr.getvalue()
     
     # 2. BONUS: Native Background Removal using rembg
     print("[+] ✂️ Removing background natively...")
