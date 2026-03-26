@@ -86,7 +86,7 @@ async def generate_clipart(
     # 2. Native Background Removal using rembg
     print("[+] ✂️ Removing background natively (Lightweight Mode)...")
     # Using the 4MB 'u2netp' model instead of the 176MB one
-    bg_removed_bytes = remove(input_bytes, session=lightweight_session)
+    bg_removed_bytes = await asyncio.to_thread(remove, input_bytes, session=lightweight_session)
     
     # Save the original and the no-bg version for the Before/After slider
     with open("generated_images/original.png", "wb") as f:
