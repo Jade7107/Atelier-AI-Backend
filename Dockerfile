@@ -14,5 +14,5 @@ COPY . .
 # Expose the port your FastAPI server uses
 EXPOSE 8000
 
-# The command to start the server when the container runs
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# The command to start the server when the container runsCMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
