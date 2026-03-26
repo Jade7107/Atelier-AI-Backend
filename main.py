@@ -22,10 +22,10 @@ HF_HEADERS = {"Authorization": f"Bearer {os.getenv('HF_API_TOKEN', '')}"}
 
 @app.get("/")
 async def root():
-    return {"message": "Atelier AI Backend is online!"}
+    return {"status": "Atelier AI Backend is Live", "environment": "Production"}
 
 async def process_style(image_bytes: bytes, style_name: str, prompt: str, filename: str) -> str:
-    """Attempts to use Hugging Face, falls back to the clean background-removed image if rate-limited."""
+    """Attempts to use Hugging Face, falls back to colorful placeholders if rate-limited."""
     filepath = f"generated_images/{filename}"
     
     try:
@@ -42,17 +42,20 @@ async def process_style(image_bytes: bytes, style_name: str, prompt: str, filena
             print(f"[+] ✨ HF Success for {style_name}!")
             with open(filepath, "wb") as f:
                 f.write(response.content)
+            return f"http://10.197.140.215:8000/images/{filename}"
         else:
             raise Exception(f"HF API returned {response.status_code}")
             
     except Exception as e:
-        print(f"[-] ⚠️ {style_name} fallback triggered (API busy). Using native Rembg output.")
-        # If API fails, save the background-removed image as the result so the UI never breaks
-        with open(filepath, "wb") as f:
-            f.write(image_bytes)
-            
-    # Return the URL that the Android app can use to download the image
-    return f"http://10.197.140.215:8000/images/{filename}"
+        print(f"[-] ⚠️ {style_name} fallback triggered (API busy). Using colorful placeholders.")
+        # If API fails, return the colorful dummy images so the UI looks great
+        dummy_urls = {
+            "Cartoon": "https://dummyimage.com/600x600/818BFA/ffffff&text=Cartoon+Style",
+            "Anime": "https://dummyimage.com/600x600/DFE2EA/1b1b23&text=Anime+Style",
+            "Flat": "https://dummyimage.com/600x600/FFB689/ffffff&text=Flat+Illustration",
+            "Pixel": "https://dummyimage.com/600x600/5D5FEF/ffffff&text=Pixel+Art"
+        }
+        return dummy_urls.get(style_name, "https://dummyimage.com/600x600/cccccc/000000&text=Error")
 
 @app.post("/api/generate")
 async def generate_clipart(
