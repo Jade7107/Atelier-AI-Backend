@@ -47,7 +47,7 @@ async def process_style(image_bytes: bytes, style_name: str, prompt: str, filena
             
     except Exception as e:
         print(f"[-] ⚠️ {style_name} fallback. Graceful degradation: using background-removed image.")
-        # 🚨 FIX 1: Copy the bg-removed image so the Android app ALWAYS finds a file!
+        # Copy the bg-removed image so the Android app ALWAYS finds a file
         shutil.copy("generated_images/no_bg.png", filepath)
         return f"{BASE_URL}/images/{filename}"
 
@@ -60,7 +60,7 @@ async def generate_clipart(
     
     input_bytes = await image.read()
 
-    # RAM PROTECTION
+    # RAM PROTECTION: Shrink image and force garbage collection
     img = Image.open(io.BytesIO(input_bytes))
     img.thumbnail((800, 800)) 
     safe_byte_arr = io.BytesIO()
@@ -84,7 +84,7 @@ async def generate_clipart(
 
     print("[+] 🧠 Processing styles sequentially to save RAM...")
     
-    # 🚨 FIX 2: Process sequentially to stop the OOM Memory Crashes
+    # Process sequentially to stop the OOM Memory Crashes
     cartoon_url = await process_style(bg_removed_bytes, "Cartoon", prompt, "cartoon.png")
     anime_url = await process_style(bg_removed_bytes, "Anime", prompt, "anime.png")
     flat_url = await process_style(bg_removed_bytes, "Flat", prompt, "flat.png")
