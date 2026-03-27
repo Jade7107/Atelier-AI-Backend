@@ -82,6 +82,13 @@ async def generate_clipart(
     img.save(safe_byte_arr, format='PNG')
     input_bytes = safe_byte_arr.getvalue()
     # ---------------------------
+
+    # 🚨 FIX 2: Manually nuke the heavy PIL objects from RAM before rembg starts
+    del img
+    del safe_byte_arr
+    import gc
+    gc.collect()
+    # ---------------------------
     
     # 2. Native Background Removal using rembg
     print("[+] ✂️ Removing background natively (Lightweight Mode)...")
